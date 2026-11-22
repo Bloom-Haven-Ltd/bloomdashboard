@@ -637,6 +637,94 @@ export type SupportDisputeDto = z.infer<typeof supportDisputeSchema>;
 export const paginatedDisputesSchema = paginatedSchema(supportDisputeSchema);
 
 // ---------------------------------------------------------------------------
+// Public inquiries (leads captured by the marketing site)
+// ---------------------------------------------------------------------------
+
+/**
+ * A record submitted through a public form on bloom-health-web.
+ *
+ * The vocabularies below are the backend's (`app/modules/inquiries/models.py`)
+ * and are asserted here so a filter chip cannot offer a value the server would
+ * answer with 422. `z.enum` on the workflow fields is deliberate: an unknown
+ * status means the backend has drifted, and the inbox should fail loudly rather
+ * than render a record whose state nobody can name.
+ *
+ * Contact details on these rows are self-reported by a person who chose to write
+ * to us. They are personal data, not clinical data: the capture form warns senders
+ * not to include health information, so nothing here is treated as a health record
+ * — and the free-text `message` is rendered as plain text only.
+ */
+export const inquiryTypeSchema = z.enum([
+  'general',
+  'partnership',
+  'business',
+  'website_feedback',
+  'app_question',
+  'media_press',
+  'other',
+]);
+export const inquiryChannelSchema = z.enum(['website_contact', 'website_partner']);
+export const inquiryStatusSchema = z.enum(['new', 'in_review', 'responded', 'closed', 'archived']);
+export type InquiryStatusDto = z.infer<typeof inquiryStatusSchema>;
+
+export const publicInquirySchema = z.object({
+  id: uuid,
+  inquiry_type: inquiryTypeSchema,
+  channel: inquiryChannelSchema,
+  name: z.string(),
+  email: z.string(),
+  phone: z.string().nullable().optional(),
+  organization: z.string().nullable().optional(),
+  organization_type: z.string().nullable().optional(),
+  partnership_interest: z.string().nullable().optional(),
+  message: z.string(),
+  source_path: z.string().nullable().optional(),
+  status: inquiryStatusSchema,
+  assigned_to: uuid.nullable().optional(),
+  internal_note: z.string().nullable().optional(),
+  first_responded_at: isoDateTime.nullable().optional(),
+  created_at: isoDateTime,
+  updated_at: isoDateTime,
+});
+export type PublicInquiryDto = z.infer<typeof publicInquirySchema>;
+
+export const paginatedInquiriesSchema = paginatedSchema(publicInquirySchema);
+
+// ---------------------------------------------------------------------------
+// Waitlist signups (launch list captured by the marketing site)
+// ---------------------------------------------------------------------------
+
+/**
+ * A visitor who joined the app-launch waitlist on bloom-health-web
+ * (`POST /api/v1/public/waitlist` → `waitlist_signups`).
+ *
+ * The vocabularies are the backend's (`app/modules/waitlist/models.py`) and are
+ * asserted here so a filter chip cannot offer a value the server answers with
+ * 422. Note what is *absent*: there is no message field and no free-text search,
+ * because the capture form collects no prose at all — `interest` is a product
+ * choice (which app), never a clinical topic. Nothing here is a health record.
+ */
+export const waitlistInterestSchema = z.enum(['patient_app', 'partner_app', 'both', 'curious']);
+export const waitlistStatusSchema = z.enum(['new', 'contacted', 'invited', 'archived']);
+export type WaitlistStatusDto = z.infer<typeof waitlistStatusSchema>;
+
+export const waitlistSignupSchema = z.object({
+  id: uuid,
+  name: z.string(),
+  email: z.string(),
+  phone: z.string().nullable().optional(),
+  interest: waitlistInterestSchema.nullable().optional(),
+  source_path: z.string().nullable().optional(),
+  status: waitlistStatusSchema,
+  internal_note: z.string().nullable().optional(),
+  created_at: isoDateTime,
+  updated_at: isoDateTime,
+});
+export type WaitlistSignupDto = z.infer<typeof waitlistSignupSchema>;
+
+export const paginatedWaitlistSignupsSchema = paginatedSchema(waitlistSignupSchema);
+
+// ---------------------------------------------------------------------------
 // Performance analytics
 // ---------------------------------------------------------------------------
 
@@ -664,6 +752,41 @@ export const systemSettingSchema = z.object({
   description: z.string().nullable().optional(),
 });
 export type SystemSettingDto = z.infer<typeof systemSettingSchema>;
+
+// ---------------------------------------------------------------------------
+// AI assistant model registry (GET/POST /admin/ai-models)
+// Read shape carries only the masked key preview — the raw api_key never
+// leaves the backend, so there is deliberately no api_key field here.
+// ---------------------------------------------------------------------------
+
+export const aiModelConfigSchema = z.object({
+  id: uuid,
+  label: z.string(),
+  model: z.string(),
+  base_url: z.string(),
+  provider: z.string(),
+  api_key_masked: z.string(),
+  is_enabled: z.boolean(),
+  priority: z.number().int(),
+  created_at: z.string().min(1),
+  updated_at: z.string().min(1),
+});
+export type AiModelConfigDto = z.infer<typeof aiModelConfigSchema>;
+
+/** Write payload for POST /admin/ai-models. */
+export interface AiModelConfigInput {
+  label: string;
+  model: string;
+  base_url: string;
+  api_key: string;
+  provider: string;
+  is_enabled: boolean;
+  priority: number;
+}
+
+/** Partial edit for PATCH /admin/ai-models/{id}; a blank/omitted api_key
+ *  keeps the stored key (backend semantics: "" maps to "leave alone"). */
+export type AiModelConfigPatch = Partial<AiModelConfigInput>;
 
 // ---------------------------------------------------------------------------
 // Platform health (GET /health — public, DB + Redis only, audit PS-1)
@@ -698,6 +821,32 @@ export const featureFlagsSchema = z.object({
   flags: z.record(z.string(), z.boolean()),
 });
 export type FeatureFlagsDto = z.infer<typeof featureFlagsSchema>;
+
+// ---------------------------------------------------------------------------
+// Daily Affirmations
+// ---------------------------------------------------------------------------
+
+export const dailyAffirmationDtoSchema = z.object({
+  id: z.string(),
+  text: z.string().min(1),
+  author: z.string().nullable().optional(),
+  category: z.string(),
+  scheduled_date: z.string().nullable().optional(),
+  is_active: z.boolean(),
+  created_by: z.string().nullable().optional(),
+  created_at: z.string(),
+  updated_at: z.string(),
+}).passthrough();
+export type DailyAffirmationDto = z.infer<typeof dailyAffirmationDtoSchema>;
+
+export const paginatedAffirmationsDtoSchema = z.object({
+  items: z.array(dailyAffirmationDtoSchema),
+  total: z.number().int().nonnegative(),
+  page: z.number().int().positive(),
+  page_size: z.number().int().positive(),
+  total_pages: z.number().int().nonnegative(),
+}).passthrough();
+export type PaginatedAffirmationsDto = z.infer<typeof paginatedAffirmationsDtoSchema>;
 
 // ---------------------------------------------------------------------------
 // Parser helper

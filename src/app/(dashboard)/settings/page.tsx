@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { EmptyState, ErrorState, TableSkeleton } from '@/components/ui/EmptyState';
 import { fetchSystemSettings, updateSystemSetting } from '@/features/settings/service';
+import { AiModelsCard } from './ai-models-card';
 import { useApiQuery } from '@/hooks/useApiQuery';
 import { useToast } from '@/providers/ToastProvider';
 import type { SystemSettingDto } from '@/lib/api/schemas';
@@ -114,6 +115,9 @@ export default function SettingsPage() {
           </ul>
         )}
       </Card>
+
+      {/* Multi-model AI assistant registry — keys added right here, no redeploy. */}
+      <AiModelsCard />
 
       {/* Edit modal */}
       <Modal
