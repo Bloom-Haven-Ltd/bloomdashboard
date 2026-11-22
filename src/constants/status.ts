@@ -16,6 +16,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import {
+  Archive,
   Ban,
   CircleCheck,
   CircleDashed,
@@ -26,7 +27,9 @@ import {
   Lock,
   PauseCircle,
   RotateCcw,
+  Send,
   ShieldCheck,
+  Ticket,
   Truck,
   Undo2,
   Wrench,
@@ -234,6 +237,79 @@ export const supportStatusConfig: Record<string, StatusConfig> = {
   resolved: { label: 'Resolved', meaning: 'Resolved and closed.', tone: 'success', icon: CircleCheck },
   rejected,
   cancelled,
+};
+
+/**
+ * Public-inquiry inbox (GET/PATCH /inquiries). These five states are the
+ * complete backend vocabulary (`InquiryStatus` in app/modules/inquiries/models.py);
+ * `first_responded_at` is stamped server-side when a record first leaves `new`,
+ * so response timing is derived, never typed in.
+ */
+export const inquiryStatusConfig: Record<string, StatusConfig> = {
+  new: {
+    label: 'New',
+    meaning: 'Received and awaiting a first response.',
+    tone: 'warning',
+    icon: CircleDashed,
+  },
+  in_review: {
+    label: 'In Review',
+    meaning: 'Someone has taken the enquiry; a reply is being written.',
+    tone: 'info',
+    icon: CircleDot,
+  },
+  responded: {
+    label: 'Responded',
+    meaning: 'A reply has been sent to the submitter.',
+    tone: 'primary',
+    icon: Send,
+  },
+  closed: {
+    label: 'Closed',
+    meaning: 'Conversation finished; no further action planned.',
+    tone: 'success',
+    icon: CircleCheck,
+  },
+  archived: {
+    label: 'Archived',
+    meaning: 'Kept for record only (spam, duplicate, or no longer relevant).',
+    tone: 'neutral',
+    icon: Archive,
+  },
+};
+
+/**
+ * App-launch waitlist (GET/PATCH /waitlist). These four states are the complete
+ * backend vocabulary (`WaitlistStatus` in app/modules/waitlist/models.py).
+ * Unlike the inquiry inbox, nothing here is a reply: `contacted` and `invited`
+ * are the admin's declarations about mail they sent from their own outbox,
+ * because the platform has no verified sending channel of its own.
+ */
+export const waitlistStatusConfig: Record<string, StatusConfig> = {
+  new: {
+    label: 'New',
+    meaning: 'Just joined; nobody on the team has touched this address yet.',
+    tone: 'warning',
+    icon: CircleDashed,
+  },
+  contacted: {
+    label: 'Contacted',
+    meaning: 'The team has written to this address (from their own mailbox).',
+    tone: 'info',
+    icon: Send,
+  },
+  invited: {
+    label: 'Invited',
+    meaning: 'Given access when the apps opened; awaiting whether they take it.',
+    tone: 'primary',
+    icon: Ticket,
+  },
+  archived: {
+    label: 'Archived',
+    meaning: 'Kept for record only (spam, duplicate, or no longer relevant).',
+    tone: 'neutral',
+    icon: Archive,
+  },
 };
 
 /**

@@ -18,6 +18,7 @@ export type NavPermission =
   | 'laboratory.read'
   | 'finance.read'
   | 'support.read'
+  | 'content.read'
   | 'audit.read'
   | 'settings.read';
 
@@ -79,6 +80,13 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    id: 'content',
+    label: 'Content',
+    items: [
+      { label: 'Daily Affirmations', href: '/affirmations', permission: 'content.read', icon: 'Sparkles', phase: 'now' },
+    ],
+  },
+  {
     id: 'platform',
     label: 'Platform',
     items: [
@@ -107,6 +115,14 @@ export const NAV_GROUPS: NavGroup[] = [
     label: 'Support',
     items: [
       { label: 'Disputes & Tickets', href: '/support', permission: 'support.read', icon: 'LifeBuoy', phase: 'now' },
+      // Leads captured from the public site (contact + partnership forms).
+      // `support.read`/`support.manage` are reused deliberately: the backend
+      // authorises these endpoints on the single `admin` role, so inventing a
+      // finer-grained permission here would be a frontend fiction (§7/§9).
+      { label: 'Public Inquiries', href: '/inquiries', permission: 'support.read', icon: 'Inbox', phase: 'now' },
+      // App-launch waitlist (marketing site /waitlist). Same authorisation
+      // posture as inquiries: the backend gates /waitlist on the admin role.
+      { label: 'Waitlist', href: '/waitlist', permission: 'support.read', icon: 'Users', phase: 'now' },
     ],
   },
   {

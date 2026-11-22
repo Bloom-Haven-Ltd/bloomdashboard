@@ -56,6 +56,9 @@ export const PERMISSIONS = [
   'notifications.send',
   'settings.read',
   'settings.manage',
+  // Content
+  'content.read',
+  'content.manage',
   // Meta
   'admin.read',
 ] as const;

@@ -31,6 +31,8 @@ const PROTECTED_PREFIXES = [
   '/verification',
   '/audit-logs',
   '/support',
+  '/inquiries',
+  '/waitlist',
   '/settings',
   '/profile',
 ];
