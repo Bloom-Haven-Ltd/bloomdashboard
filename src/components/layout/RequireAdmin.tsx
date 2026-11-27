@@ -1,12 +1,11 @@
 'use client';
 
 /**
- * RequireAdmin — the single route guard for the dashboard (replaces
- * AdminGuard + ProtectedRoute).
+ * RequireAdmin — the single route guard for the dashboard.
  *
  * UX boundary only: redirects unauthenticated visitors and renders nothing
  * until the backend session validation completes. Authorization itself is
- * enforced by the backend on every request (§9/§36).
+ * enforced by the backend on every request.
  */
 
 import { useEffect, type ReactNode } from 'react';
@@ -26,8 +25,13 @@ export function RequireAdmin({ children }: { children: ReactNode }) {
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary/20 border-t-primary" aria-hidden />
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Verifying session…</p>
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-subtle">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary/25 border-t-primary" aria-hidden />
+        </div>
+        <div className="text-center">
+          <p className="text-xs font-bold uppercase tracking-widest text-foreground">Bloom Haven Health</p>
+          <p className="mt-1 text-xs text-foreground-muted">Verifying secure session…</p>
+        </div>
       </div>
     );
   }

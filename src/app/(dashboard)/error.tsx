@@ -22,7 +22,7 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div className="rounded-2xl border border-border bg-card">
+    <div className="rounded-lg border border-border bg-surface">
       <ErrorState
         code="UNEXPECTED_ERROR"
         message="The page failed to render. This has been recorded — you can retry safely."

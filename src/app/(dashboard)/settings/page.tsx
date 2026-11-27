@@ -66,14 +66,14 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-xl font-bold tracking-tight text-slate-900">Platform settings</h2>
-        <p className="mt-0.5 text-sm text-slate-500">
+        <h2 className="text-xl font-bold tracking-tight text-foreground">Platform settings</h2>
+        <p className="mt-0.5 text-sm text-foreground-muted">
           Global configuration managed by the backend. Every change is audited.
         </p>
       </header>
 
       <Card padding="none" className="overflow-hidden">
-        <div className="border-b border-slate-100 px-6 py-4">
+        <div className="border-b border-border px-6 py-4">
           <CardHeader title="System configuration" description="Applied platform-wide immediately after save." />
         </div>
         {query.isLoading ? (
@@ -88,16 +88,16 @@ export default function SettingsPage() {
         ) : items.length === 0 ? (
           <EmptyState title="No settings exposed" description="The backend has not published any configurable settings." />
         ) : (
-          <ul className="divide-y divide-slate-50">
+          <ul className="divide-y divide-border/60">
             {items.map((setting) => (
               <li key={setting.key} className="flex items-center justify-between gap-4 px-6 py-4">
                 <div className="min-w-0">
-                  <p className="font-mono text-sm font-semibold text-slate-800">{setting.key}</p>
-                  {setting.description && <p className="text-xs text-slate-500">{setting.description}</p>}
-                  <p className="mt-0.5 text-[11px] font-bold uppercase tracking-widest text-slate-400">{setting.type}</p>
+                  <p className="font-mono text-sm font-semibold text-foreground">{setting.key}</p>
+                  {setting.description && <p className="text-xs text-foreground-muted">{setting.description}</p>}
+                  <p className="mt-0.5 text-[11px] font-bold uppercase tracking-widest text-foreground-subtle">{setting.type}</p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="max-w-[16rem] truncate rounded-lg bg-slate-50 px-3 py-1.5 font-mono text-xs text-slate-600">
+                  <span className="max-w-[16rem] truncate rounded-lg bg-surface-muted px-3 py-1.5 font-mono text-xs text-foreground-muted">
                     {setting.value}
                   </span>
                   <Button

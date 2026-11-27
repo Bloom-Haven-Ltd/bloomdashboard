@@ -14,23 +14,28 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'bg-primary text-white shadow-sm hover:bg-primary/90 focus-visible:ring-primary/40',
-  secondary: 'bg-secondary text-white shadow-sm hover:bg-secondary/90 focus-visible:ring-secondary/40',
-  outline: 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-300',
-  ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-slate-300',
-  danger: 'bg-red-600 text-white shadow-sm hover:bg-red-700 focus-visible:ring-red-300',
+  primary:
+    'bg-primary text-primary-foreground shadow-sm hover:bg-primary-hover focus-visible:ring-primary/40',
+  secondary:
+    'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary-hover focus-visible:ring-secondary/40',
+  outline:
+    'border border-border bg-surface text-foreground shadow-sm hover:border-border-strong hover:bg-surface-muted focus-visible:ring-primary/30',
+  ghost:
+    'text-foreground-muted hover:bg-surface-muted hover:text-foreground focus-visible:ring-primary/30',
+  danger:
+    'bg-danger text-white shadow-sm hover:bg-danger/90 focus-visible:ring-danger/40',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
-  xs: 'h-7 px-2.5 text-xs gap-1 rounded-lg',
-  sm: 'h-9 px-3.5 text-sm gap-1.5 rounded-lg',
-  md: 'h-10 px-4 text-sm gap-2 rounded-xl',
-  lg: 'h-12 px-6 text-base gap-2 rounded-xl',
+  xs: 'h-7 px-2.5 text-xs gap-1 rounded-md',
+  sm: 'h-8.5 px-3 text-xs gap-1.5 rounded-md',
+  md: 'h-9.5 px-4 text-sm gap-2 rounded-lg',
+  lg: 'h-11 px-5 text-sm gap-2 rounded-lg',
 };
 
 /**
- * Design-system button: variant + size driven, loading state with spinner,
- * visible focus rings, disabled semantics preserved (§46/§45).
+ * Design-system button: token-driven variants, restrained radius, loading
+ * spinner, active micro-feedback, and accessible focus rings.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { className, variant = 'primary', size = 'md', isLoading = false, disabled, children, type = 'button', ...props },
@@ -43,7 +48,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       disabled={disabled || isLoading}
       aria-busy={isLoading || undefined}
       className={cn(
-        'inline-flex select-none items-center justify-center font-semibold transition-colors',
+        'inline-flex select-none items-center justify-center font-semibold transition-all duration-150',
+        'active:scale-[0.985] disabled:active:scale-100',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1',
         'disabled:pointer-events-none disabled:opacity-50',
         VARIANT_CLASSES[variant],
@@ -52,7 +58,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       )}
       {...props}
     >
-      {isLoading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+      {isLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />}
       {children}
     </button>
   );

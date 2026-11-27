@@ -198,7 +198,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const raw = await api.post<unknown>(
         '/auth/session',
         { app_type: 'admin_dashboard', platform: 'web' },
-        { headers: { Authorization: `Bearer ${token}` }, skipAuthTeardown: true }
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          timeoutMs: 65_000,
+          skipAuthTeardown: true,
+        }
       );
       const session = parseSessionResponse(raw);
 

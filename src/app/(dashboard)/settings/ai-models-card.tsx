@@ -153,7 +153,7 @@ export function AiModelsCard() {
 
   return (
     <Card padding="none" className="overflow-hidden">
-      <div className="flex items-center justify-between gap-4 border-b border-slate-100 px-6 py-4">
+      <div className="flex items-center justify-between gap-4 border-b border-border px-6 py-4">
         <CardHeader
           title="AI assistant models"
           description="Multiple models with failover, tried in priority order. Keys stay on the server."
@@ -185,20 +185,20 @@ export function AiModelsCard() {
           description="Until you add one here, the assistant runs on the server's env configuration. Add a model id and its API key to switch to the dashboard-managed registry."
         />
       ) : (
-        <ul className="divide-y divide-slate-50">
+        <ul className="divide-y divide-border/60">
           {items.map((row) => (
             <li key={row.id} className="flex items-center justify-between gap-4 px-6 py-4">
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-800">{row.label}</p>
-                <p className="truncate font-mono text-xs text-slate-500">{row.model}</p>
-                <p className="mt-0.5 truncate text-[11px] text-slate-400">{row.base_url}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{row.label}</p>
+                <p className="truncate font-mono text-xs text-foreground-muted">{row.model}</p>
+                <p className="mt-0.5 truncate text-[11px] text-foreground-subtle">{row.base_url}</p>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <Badge variant={row.is_enabled ? 'success' : 'neutral'}>
                   {row.is_enabled ? 'enabled' : 'disabled'}
                 </Badge>
                 <Badge variant="neutral">P{row.priority}</Badge>
-                <span className="rounded-lg bg-slate-50 px-2.5 py-1.5 font-mono text-xs text-slate-500">
+                <span className="rounded-lg bg-surface-muted px-2.5 py-1.5 font-mono text-xs text-foreground-muted">
                   {row.api_key_masked}
                 </span>
                 <Button
@@ -227,7 +227,7 @@ export function AiModelsCard() {
                   onClick={() => setPendingDelete(row)}
                   aria-label={`Remove ${row.label}`}
                 >
-                  <Trash2 className="h-4 w-4 text-red-500" aria-hidden />
+                  <Trash2 className="h-4 w-4 text-danger" aria-hidden />
                 </Button>
               </div>
             </li>
@@ -259,14 +259,14 @@ export function AiModelsCard() {
               label="Label"
               value={draft.label}
               onChange={(e) => setDraft({ ...draft, label: e.target.value })}
-              hint="How you'll recognize it in this list, e.g. “Qwen primary”."
+              hint={'How you\'ll recognize it in this list, e.g. "Qwen primary".'}
             />
             <Input
               label="Model id"
               value={draft.model}
               onChange={(e) => setDraft({ ...draft, model: e.target.value })}
               placeholder="Qwen/Qwen3-4B-Instruct-2507:featherless-ai"
-              hint="Exact model id; a “:provider” suffix pins the router provider."
+              hint={'Exact model id; a ":provider" suffix pins the router provider.'}
             />
             <Input
               label="Base URL"
@@ -303,7 +303,7 @@ export function AiModelsCard() {
               onCheckedChange={(checked) => setDraft({ ...draft, is_enabled: checked })}
             />
             {error && (
-              <p role="alert" className="text-xs font-medium text-red-600">
+              <p role="alert" className="text-xs font-medium text-danger">
                 {error}
               </p>
             )}
@@ -334,7 +334,7 @@ export function AiModelsCard() {
         }
       >
         {pendingDelete && (
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-foreground-muted">
             <span className="font-mono">{pendingDelete.model}</span> will no longer be
             tried for patient messages.
           </p>

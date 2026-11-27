@@ -4,7 +4,7 @@
  * Toast provider — accessible, non-blocking action feedback.
  *
  * Announces messages via a polite ARIA live region, respects reduced motion,
- * auto-dismisses with pause-on-hover, and exposes a single `useToast` hook.
+ * auto-dismisses, and exposes a single `useToast` hook.
  */
 
 import {
@@ -19,6 +19,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Info, TriangleAlert, X, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MOTION_EASE } from '@/lib/motion';
 
 export type ToastVariant = 'success' | 'error' | 'info' | 'warning';
 
@@ -26,7 +27,7 @@ export interface Toast {
   id: string;
   variant: ToastVariant;
   title: string;
-  /** Optional supporting detail. Never include PHI here (§33). */
+  /** Optional supporting detail. Never include PHI here. */
   description?: string;
 }
 
@@ -41,23 +42,23 @@ const AUTO_DISMISS_MS = 6000;
 const VARIANT_STYLES: Record<ToastVariant, { icon: typeof Info; wrap: string; iconColor: string }> = {
   success: {
     icon: CheckCircle2,
-    wrap: 'border-emerald-200 bg-white',
-    iconColor: 'text-emerald-600',
+    wrap: 'border-success/25 bg-surface',
+    iconColor: 'text-success',
   },
   error: {
     icon: XCircle,
-    wrap: 'border-red-200 bg-white',
-    iconColor: 'text-red-600',
+    wrap: 'border-danger/25 bg-surface',
+    iconColor: 'text-danger',
   },
   warning: {
     icon: TriangleAlert,
-    wrap: 'border-amber-200 bg-white',
-    iconColor: 'text-amber-600',
+    wrap: 'border-secondary/40 bg-surface',
+    iconColor: 'text-warning',
   },
   info: {
     icon: Info,
-    wrap: 'border-slate-200 bg-white',
-    iconColor: 'text-slate-500',
+    wrap: 'border-border bg-surface',
+    iconColor: 'text-primary',
   },
 };
 
@@ -73,30 +74,30 @@ function ToastItem({ item, onDismiss }: ToastItemProps) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 16, scale: 0.98 }}
+      initial={{ opacity: 0, y: 12, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 8, scale: 0.98 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      exit={{ opacity: 0, y: 6, scale: 0.98 }}
+      transition={{ duration: 0.2, ease: MOTION_EASE }}
       className={cn(
-        'pointer-events-auto flex w-80 max-w-[calc(100vw-2rem)] items-start gap-3 rounded-xl border p-4 shadow-lg shadow-slate-900/5',
+        'pointer-events-auto flex w-84 max-w-[calc(100vw-2rem)] items-start gap-3 rounded-lg border p-3.5 shadow-lg',
         styles.wrap
       )}
       role="status"
     >
-      <Icon className={cn('mt-0.5 h-5 w-5 shrink-0', styles.iconColor)} aria-hidden />
+      <Icon className={cn('mt-0.5 h-4.5 w-4.5 shrink-0', styles.iconColor)} aria-hidden />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-slate-900">{item.title}</p>
+        <p className="text-sm font-semibold text-foreground">{item.title}</p>
         {item.description && (
-          <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{item.description}</p>
+          <p className="mt-0.5 text-xs leading-relaxed text-foreground-muted">{item.description}</p>
         )}
       </div>
       <button
         type="button"
         onClick={() => onDismiss(item.id)}
-        className="rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        className="rounded-md p-1 text-foreground-subtle transition-colors hover:bg-surface-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         aria-label="Dismiss notification"
       >
-        <X className="h-4 w-4" aria-hidden />
+        <X className="h-3.5 w-3.5" aria-hidden />
       </button>
     </motion.div>
   );
@@ -135,7 +136,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed bottom-4 right-4 z-[100] flex flex-col gap-2"
+        className="pointer-events-none fixed bottom-4 right-4 z-(--z-toast) flex flex-col gap-2"
       >
         <AnimatePresence>
           {toasts.map((item) => (
