@@ -49,14 +49,34 @@ function isProtected(pathname: string): boolean {
  * is tracked for the production-hardening phase — do not "fix" this blindly,
  * it will break hydration and Firebase Auth popups.
  */
+function getConfiguredApiOrigin(): string | null {
+  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (!raw || !/^https?:\/\//i.test(raw)) return null;
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return null;
+  }
+}
+
 function contentSecurityPolicy(isDev: boolean): string {
+  const apiOrigin = getConfiguredApiOrigin();
+  const connectSources = [
+    "'self'",
+    'https://*.googleapis.com',
+    'https://*.firebaseio.com',
+    'https://*.firebaseapp.com',
+    'wss://*.firebaseio.com',
+    ...(apiOrigin ? [apiOrigin] : []),
+  ].join(' ');
+
   const directives = [
     "default-src 'self'",
     // Next.js inline scripts/styles + recharts dynamic styles.
     `style-src 'self' 'unsafe-inline'${isDev ? ' ' : ''}`,
     `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
     // Firebase Auth (identitytoolkit, securetoken) + API + recharts data.
-    "connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com",
+    `connect-src ${connectSources}`,
     'img-src \'self\' data: blob: https:',
     "font-src 'self' data:",
     'frame-ancestors \'none\'',
