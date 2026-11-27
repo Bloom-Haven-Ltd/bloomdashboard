@@ -44,6 +44,7 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ErrorState, TableSkeleton } from '@/components/ui/EmptyState';
 import { MetricCard, MetricCardSkeletonRow } from '@/components/data-display/MetricCard';
+import { ChartCard } from '@/components/data-display/ChartCard';
 import { PlatformHealthCard } from '@/components/data-display/PlatformHealthCard';
 import { useSystemStats, useRecentAuditLogs, usePerformance } from '@/features/dashboard/hooks';
 import { usePlatformHealth } from '@/features/health/hooks';
@@ -239,63 +240,80 @@ export default function DashboardHomePage() {
 
       {/* ── Trends (§41/§42/§43) + Partner distribution (§29) ── */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="Platform activity — last 24 hours"
-            description="Registrations, consultations and orders from backend analytics."
-          />
-          <div className="mt-6 h-64">
-            {performance.isLoading ? (
-              <TableSkeleton rows={4} columns={1} />
-            ) : performance.data && performance.data.data.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
-                <AreaChart data={performance.data.data} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
-                  <defs>
-                    <linearGradient id="usersFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.18} />
-                      <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid)" />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 10, fill: 'var(--foreground-subtle)' }}
-                    dy={8}
-                  />
-                  <YAxis
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 10, fill: 'var(--foreground-subtle)' }}
-                    allowDecimals={false}
-                  />
-                  <Tooltip contentStyle={TOOLTIP_STYLE} />
-                  <Area
-                    type="monotone"
-                    dataKey="users"
-                    name="Registrations"
-                    stroke="var(--chart-1)"
-                    strokeWidth={2}
-                    fill="url(#usersFill)"
-                  />
-                  <Area type="monotone" dataKey="consultations" name="Consultations" stroke="var(--chart-3)" strokeWidth={2} fillOpacity={0} />
-                  <Area type="monotone" dataKey="orders" name="Orders" stroke="var(--chart-2)" strokeWidth={2} fillOpacity={0} />
-                </AreaChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="flex h-full items-center justify-center text-sm text-foreground-subtle">
-                {performance.error ? 'Analytics unavailable right now.' : 'No activity data for this period yet.'}
-              </div>
-            )}
-          </div>
-        </Card>
+        <ChartCard
+          className="lg:col-span-2"
+          title="Platform activity — last 24 hours"
+          description="Registrations, consultations and orders from backend analytics."
+          loading={performance.isLoading}
+          error={
+            performance.error
+              ? {
+                  code: performance.error.code,
+                  message: performance.error.message,
+                  requestId: performance.error.requestId,
+                }
+              : null
+          }
+          onRetry={() => void performance.refetch()}
+          isEmpty={!performance.data || performance.data.data.length === 0}
+          emptyTitle="No activity data"
+          emptyDescription="No activity data for this period yet."
+          heightClassName="h-64"
+        >
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+            minWidth={0}
+            minHeight={0}
+            initialDimension={{ width: 520, height: 256 }}
+          >
+            <AreaChart data={performance.data?.data ?? []} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
+              <defs>
+                <linearGradient id="usersFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.18} />
+                  <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--chart-grid)" />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: 'var(--foreground-subtle)' }}
+                dy={8}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: 'var(--foreground-subtle)' }}
+                allowDecimals={false}
+              />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
+              <Area
+                type="monotone"
+                dataKey="users"
+                name="Registrations"
+                stroke="var(--chart-1)"
+                strokeWidth={2}
+                fill="url(#usersFill)"
+              />
+              <Area type="monotone" dataKey="consultations" name="Consultations" stroke="var(--chart-3)" strokeWidth={2} fillOpacity={0} />
+              <Area type="monotone" dataKey="orders" name="Orders" stroke="var(--chart-2)" strokeWidth={2} fillOpacity={0} />
+            </AreaChart>
+          </ResponsiveContainer>
+        </ChartCard>
 
         <Card>
           <CardHeader title="Partner distribution" description="Verified roles across the platform." />
           <div className="mt-4 h-48">
             {partnerTotal > 0 ? (
-              <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+                minWidth={0}
+                minHeight={0}
+                initialDimension={{ width: 320, height: 192 }}
+              >
                 <PieChart>
                   <Pie
                     data={partnerDistribution}

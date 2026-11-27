@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import {
-  Sparkles,
   Plus,
   Search,
   Pin,
@@ -57,6 +56,16 @@ const STATUS_FILTER_OPTIONS = [
 ];
 
 const PAGE_SIZE = 15;
+
+/** Category color map using design-token-compatible semantic colors. */
+const CATEGORY_COLORS: Record<string, string> = {
+  mindfulness: 'bg-primary/10 text-primary border-primary/20',
+  gratitude: 'bg-warning-subtle text-warning border-warning/20',
+  'healing & recovery': 'bg-primary/10 text-[#005F5F] border-primary/20',
+  'self-care': 'bg-purple-50 text-purple-700 border-purple-200',
+  resilience: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+  'mental clarity': 'bg-primary/10 text-primary border-primary/20',
+};
 
 export default function DailyAffirmationsPage() {
   const [page, setPage] = useState(1);
@@ -181,22 +190,7 @@ export default function DailyAffirmationsPage() {
 
   // Category Badge Styler
   const getCategoryColor = (cat: string) => {
-    switch (cat.toLowerCase()) {
-      case 'mindfulness':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'gratitude':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'healing & recovery':
-        return 'bg-sky-50 text-sky-700 border-sky-200';
-      case 'self-care':
-        return 'bg-purple-50 text-purple-700 border-purple-200';
-      case 'resilience':
-        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-      case 'mental clarity':
-        return 'bg-teal-50 text-teal-700 border-teal-200';
-      default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
-    }
+    return CATEGORY_COLORS[cat.toLowerCase()] ?? 'bg-surface-muted text-foreground-muted border-border';
   };
 
   // Columns definition
@@ -208,11 +202,11 @@ export default function DailyAffirmationsPage() {
         <div className="flex items-start gap-2.5 max-w-md py-1">
           <Quote className="h-4 w-4 text-primary shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-medium text-slate-900 line-clamp-2 leading-relaxed">
+            <p className="text-sm font-medium text-foreground line-clamp-2 leading-relaxed">
               &ldquo;{item.text}&rdquo;
             </p>
             {item.author && (
-              <p className="text-xs text-slate-500 mt-0.5">&mdash; {item.author}</p>
+              <p className="text-xs text-foreground-muted mt-0.5">&mdash; {item.author}</p>
             )}
           </div>
         </div>
@@ -239,13 +233,13 @@ export default function DailyAffirmationsPage() {
       cell: (item) => (
         <div className="flex items-center gap-1.5 text-xs">
           {item.scheduled_date ? (
-            <span className="inline-flex items-center gap-1 font-medium text-slate-800 bg-slate-100 px-2 py-1 rounded-md">
-              <Calendar className="h-3.5 w-3.5 text-slate-500" />
+            <span className="inline-flex items-center gap-1 font-medium text-foreground bg-surface-muted px-2 py-1 rounded-md">
+              <Calendar className="h-3.5 w-3.5 text-foreground-subtle" />
               {item.scheduled_date.slice(0, 10)}
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 text-slate-500 italic">
-              <RefreshCw className="h-3 w-3 text-slate-400" />
+            <span className="inline-flex items-center gap-1 text-foreground-muted italic">
+              <RefreshCw className="h-3 w-3 text-foreground-subtle" />
               Daily Pool
             </span>
           )}
@@ -260,8 +254,8 @@ export default function DailyAffirmationsPage() {
         <span
           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
             item.is_active
-              ? 'bg-emerald-100 text-emerald-800'
-              : 'bg-slate-100 text-slate-500'
+              ? 'bg-success/10 text-success'
+              : 'bg-surface-muted text-foreground-muted'
           }`}
         >
           {item.is_active ? (
@@ -290,7 +284,7 @@ export default function DailyAffirmationsPage() {
             title="Pin as Today's Affirmation"
             onClick={() => handlePinToday(item.id)}
             disabled={pinMutation.isPending}
-            className="text-slate-600 hover:text-primary p-1.5 h-auto"
+            className="text-foreground-muted hover:text-primary p-1.5 h-auto"
           >
             <Pin className="h-4 w-4" />
           </Button>
@@ -299,7 +293,7 @@ export default function DailyAffirmationsPage() {
             size="xs"
             title="Edit Affirmation"
             onClick={() => handleOpenEdit(item)}
-            className="text-slate-600 hover:text-slate-900 p-1.5 h-auto"
+            className="text-foreground-muted hover:text-foreground p-1.5 h-auto"
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -308,7 +302,7 @@ export default function DailyAffirmationsPage() {
             size="xs"
             title="Delete Affirmation"
             onClick={() => setDeletingId(item.id)}
-            className="text-slate-600 hover:text-red-600 p-1.5 h-auto"
+            className="text-foreground-muted hover:text-danger p-1.5 h-auto"
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -337,16 +331,16 @@ export default function DailyAffirmationsPage() {
       />
 
       {/* Today's Active Spotlight Card */}
-      <Card className="border-primary/20 bg-linear-to-br from-primary/5 via-white to-amber-50/30 shadow-xs">
+      <Card className="border-primary/20 bg-linear-to-br from-primary/5 via-white to-warning-subtle/30 shadow-xs">
         <div className="p-5 md:p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-primary/10 rounded-xl text-primary">
+              <div className="p-2 bg-primary/10 rounded-lg text-primary">
                 <Sun className="h-5 w-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-semibold text-slate-900">
+                  <h3 className="text-sm font-semibold text-foreground">
                     Live Today&apos;s Affirmation
                   </h3>
                   {todayData?.scheduled_date ? (
@@ -355,7 +349,7 @@ export default function DailyAffirmationsPage() {
                     <Badge variant="info">Daily Pool Rotation</Badge>
                   )}
                 </div>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-foreground-muted">
                   Visible right now to all patient mobile app users
                 </p>
               </div>
@@ -386,21 +380,21 @@ export default function DailyAffirmationsPage() {
             {isTodayLoading ? (
               <div className="animate-pulse flex space-x-4 py-2">
                 <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                  <div className="h-3 bg-slate-200 rounded w-1/4"></div>
+                  <div className="h-4 bg-surface-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-surface-muted rounded w-1/4"></div>
                 </div>
               </div>
             ) : todayData ? (
               <div className="space-y-1.5">
-                <p className="text-base md:text-lg font-medium text-slate-800 italic leading-relaxed">
+                <p className="text-base md:text-lg font-medium text-foreground italic leading-relaxed">
                   &ldquo;{todayData.text}&rdquo;
                 </p>
-                <p className="text-xs text-slate-500 font-medium">
+                <p className="text-xs text-foreground-muted font-medium">
                   &mdash; {todayData.author || 'Bloom Health'}
                 </p>
               </div>
             ) : (
-              <p className="text-sm text-slate-500 italic">No affirmations available.</p>
+              <p className="text-sm text-foreground-muted italic">No affirmations available.</p>
             )}
           </div>
         </div>
@@ -540,12 +534,12 @@ export default function DailyAffirmationsPage() {
               />
             </div>
             <div className="flex items-center pt-6">
-              <label className="flex items-center gap-2.5 cursor-pointer text-sm font-medium text-slate-700">
+              <label className="flex items-center gap-2.5 cursor-pointer text-sm font-medium text-foreground-muted">
                 <input
                   type="checkbox"
                   checked={formIsActive}
                   onChange={(e) => setFormIsActive(e.target.checked)}
-                  className="rounded border-slate-300 text-primary focus:ring-primary h-4 w-4"
+                  className="rounded border-border text-primary focus:ring-primary h-4 w-4"
                 />
                 Active (Eligible for delivery)
               </label>
@@ -576,7 +570,7 @@ export default function DailyAffirmationsPage() {
           </div>
         }
       >
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-foreground-muted">
           This operation cannot be undone.
         </p>
       </Modal>

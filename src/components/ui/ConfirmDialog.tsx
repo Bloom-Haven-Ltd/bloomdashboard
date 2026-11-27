@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * Confirmation dialog for destructive/administrative operations (§32).
- * Pattern: Action → Reason → Confirmation → (backend authorizes → audit).
+ * Confirmation dialog for destructive/administrative operations.
+ * Pattern: Action -> Reason -> Confirmation -> (backend authorizes -> audit).
  */
 
 import { useState } from 'react';
@@ -35,8 +35,6 @@ export function ConfirmDialog({ open, onClose, onConfirm, strings, busy = false 
   const [phrase, setPhrase] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  // Reset fields when the dialog transitions to open — React's recommended
-  // "adjust state during render when a prop changes" pattern (no effect).
   const [wasOpen, setWasOpen] = useState(open);
   if (open && !wasOpen) {
     setWasOpen(true);
@@ -86,7 +84,7 @@ export function ConfirmDialog({ open, onClose, onConfirm, strings, busy = false 
       }
     >
       <div className="space-y-4">
-        <p className="text-sm text-slate-600">{strings.consequence}</p>
+        <p className="text-sm leading-relaxed text-foreground-muted">{strings.consequence}</p>
         {strings.requireReason && (
           <Textarea
             label="Reason (recorded in audit trail)"

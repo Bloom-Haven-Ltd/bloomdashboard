@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MOTION_EASE } from '@/lib/motion';
 
 export interface ConfirmAction {
   /** Short action name, e.g. "Suspend user". */
@@ -29,7 +30,7 @@ interface ModalProps {
 
 /**
  * Accessible modal dialog: portal rendering, focus trap, Escape to close,
- * click-outside dismissal, aria-modal semantics (§45).
+ * click-outside dismissal, aria-modal semantics, and restrained motion.
  */
 export function Modal({ open, onClose, title, description, children, footer, size = 'md' }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
@@ -81,13 +82,13 @@ export function Modal({ open, onClose, title, description, children, footer, siz
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-(--z-modal) flex items-center justify-center p-4">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            transition={{ duration: 0.16 }}
+            className="absolute inset-0 bg-foreground/35 backdrop-blur-[2px]"
             onClick={onClose}
             aria-hidden
           />
@@ -99,23 +100,23 @@ export function Modal({ open, onClose, title, description, children, footer, siz
             initial={{ opacity: 0, scale: 0.97, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: 8 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
+            transition={{ duration: 0.2, ease: MOTION_EASE }}
             className={cn(
-              'relative flex max-h-[85vh] w-full flex-col rounded-2xl border border-slate-100 bg-white shadow-2xl',
+              'relative flex max-h-[85vh] w-full flex-col rounded-xl border border-border bg-surface shadow-lg',
               size === 'sm' && 'max-w-md',
               size === 'md' && 'max-w-lg',
               size === 'lg' && 'max-w-2xl'
             )}
           >
-            <header className="flex items-start justify-between gap-4 border-b border-slate-100 px-6 py-4">
-              <div>
-                <h2 className="text-base font-semibold text-slate-900">{title}</h2>
-                {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
+            <header className="flex items-start justify-between gap-4 border-b border-border px-6 py-4">
+              <div className="min-w-0">
+                <h2 className="text-base font-semibold text-foreground">{title}</h2>
+                {description && <p className="mt-0.5 text-sm text-foreground-muted">{description}</p>}
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="rounded-md p-1.5 text-foreground-subtle transition-colors hover:bg-surface-muted hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                 aria-label="Close dialog"
               >
                 <X className="h-4 w-4" aria-hidden />
@@ -123,7 +124,9 @@ export function Modal({ open, onClose, title, description, children, footer, siz
             </header>
             <div className="overflow-y-auto px-6 py-5">{children}</div>
             {footer && (
-              <footer className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4">{footer}</footer>
+              <footer className="flex justify-end gap-2.5 border-t border-border bg-surface-muted/40 px-6 py-3.5 rounded-b-xl">
+                {footer}
+              </footer>
             )}
           </motion.div>
         </div>

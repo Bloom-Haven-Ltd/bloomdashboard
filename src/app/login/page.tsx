@@ -50,16 +50,20 @@ export default function LoginPage() {
       await signIn(email.trim(), password);
       router.replace('/dashboard');
     } catch (cause) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('Sign-in failed:', cause);
-      }
       const apiError = ApiError.from(cause);
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Sign-in failed:', apiError.code);
+      }
       // Generic copy: never leak whether the account exists (§62).
-      setError(
-        apiError.code === 'FORBIDDEN'
-          ? 'This account does not have administrator access.'
-          : 'Sign-in failed. Check your credentials and try again.'
-      );
+      if (apiError.code === 'FORBIDDEN') {
+        setError('This account does not have administrator access.');
+      } else if (apiError.code === 'TIMEOUT') {
+        setError('The server took too long to respond (it may be waking up). Please try again.');
+      } else if (apiError.code === 'NETWORK_ERROR') {
+        setError('Unable to reach the server. Check your connection and try again.');
+      } else {
+        setError('Sign-in failed. Check your credentials and try again.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -77,21 +81,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-surface">
       {/* Brand panel */}
-      <div className="relative hidden w-1/2 overflow-hidden bg-slate-900 lg:block">
+      <div className="relative hidden w-1/2 overflow-hidden bg-[#004D4D] lg:block">
         <Image
           src="/images/login-bg.png"
           alt=""
           fill
           sizes="50vw"
-          className="object-cover object-center opacity-60"
+          className="object-cover object-center opacity-50"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#003D3D]/90 via-[#004D4D]/40 to-transparent" />
         <div className="relative z-10 flex h-full flex-col justify-end p-14">
           <div className="mb-5 flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
+            <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-white/10 backdrop-blur">
               <ShieldCheck className="h-6 w-6 text-white" aria-hidden />
             </span>
             <span className="text-3xl font-extrabold italic tracking-tight text-white">Bloom.</span>
@@ -99,29 +103,29 @@ export default function LoginPage() {
           <h2 className="max-w-md text-2xl font-bold leading-snug text-white">
             Administrative control for Bloom Haven Health
           </h2>
-          <p className="mt-2 max-w-md text-sm leading-relaxed text-slate-300">
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-white/70">
             Secure access to operations, verification, finance and platform oversight.
           </p>
         </div>
       </div>
 
       {/* Form panel */}
-      <div className="flex w-full items-center justify-center bg-slate-50 p-6 sm:p-12 lg:w-1/2">
+      <div className="flex w-full items-center justify-center bg-background p-6 sm:p-12 lg:w-1/2">
         <div className="w-full max-w-md">
           <div className="mb-8 lg:hidden">
-            <span className="text-2xl font-extrabold italic tracking-tight text-slate-900">Bloom.</span>
+            <span className="text-2xl font-extrabold italic tracking-tight text-foreground">Bloom.</span>
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Administrator sign-in</h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Administrator sign-in</h1>
+          <p className="mt-1 text-sm text-foreground-muted">
             Authorized personnel only. Sessions are validated against the platform backend.
           </p>
 
-          <div className="mt-8 rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
+          <div className="mt-8 rounded-lg border border-border bg-surface p-8 shadow-sm">
             {error && (
               <div
                 role="alert"
-                className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+                className="mb-6 rounded-lg border border-danger/20 bg-danger/5 px-4 py-3 text-sm font-medium text-danger"
               >
                 {error}
               </div>
@@ -129,7 +133,7 @@ export default function LoginPage() {
             {resetNotice && (
               <div
                 role="status"
-                className="mb-6 rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-sm font-medium text-sky-700"
+                className="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 text-sm font-medium text-primary"
               >
                 Password recovery is handled by the platform team. Contact your administrator if you
                 lost access.
@@ -174,7 +178,7 @@ export default function LoginPage() {
             </form>
           </div>
 
-          <p className="mt-6 text-center text-xs text-slate-400">
+          <p className="mt-6 text-center text-xs text-foreground-subtle">
             Bloom Haven Health Admin · v{env.appVersion}
           </p>
         </div>

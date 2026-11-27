@@ -7,17 +7,16 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Static surface card. Plain div (no hover animation) — the admin console
- * prioritizes stability and readability over motion.
+ * Enterprise surface card: crisp 1px border, subtle shadow, restrained radius.
  */
 export function Card({ className, padding = 'md', ...props }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-2xl border border-border bg-card text-card-foreground shadow-sm',
+        'rounded-lg border border-border bg-surface text-foreground shadow-sm',
         padding === 'sm' && 'p-4',
-        padding === 'md' && 'p-6',
-        padding === 'lg' && 'p-8',
+        padding === 'md' && 'p-5',
+        padding === 'lg' && 'p-6',
         className
       )}
       {...props}
@@ -35,8 +34,8 @@ export function CardHeader({ title, description, action, className, ...props }: 
   return (
     <div className={cn('flex items-start justify-between gap-4', className)} {...props}>
       <div className="min-w-0">
-        <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-        {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
+        <h3 className="text-section-heading">{title}</h3>
+        {description && <p className="mt-0.5 text-xs text-foreground-muted">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

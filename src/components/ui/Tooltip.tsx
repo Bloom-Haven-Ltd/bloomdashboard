@@ -8,12 +8,18 @@ export interface TooltipProps {
   label: string;
   /** Single trigger element — receives aria-describedby via cloneElement. */
   children: ReactElement;
-  side?: 'top' | 'bottom';
+  side?: 'top' | 'bottom' | 'right';
   className?: string;
 }
 
+const SIDE_CLASSES: Record<NonNullable<TooltipProps['side']>, string> = {
+  top: 'left-1/2 -translate-x-1/2 bottom-full mb-1.5',
+  bottom: 'left-1/2 -translate-x-1/2 top-full mt-1.5',
+  right: 'left-full top-1/2 -translate-y-1/2 ml-2.5',
+};
+
 /**
- * Accessible CSS-only tooltip (§57): hover + keyboard focus, no portal and no
+ * Accessible CSS-only tooltip: hover + keyboard focus, no portal and no
  * dependency. The trigger element receives `aria-describedby` directly so
  * screen readers announce the tooltip text on focus.
  */
@@ -33,9 +39,9 @@ export function Tooltip({ label, children, side = 'bottom', className }: Tooltip
         role="tooltip"
         id={id}
         className={cn(
-          'pointer-events-none absolute left-1/2 z-(--z-popover) -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background opacity-0 shadow-md transition-opacity duration-100',
+          'pointer-events-none absolute z-(--z-popover) whitespace-nowrap rounded-md bg-foreground px-2.5 py-1 text-xs font-medium text-surface opacity-0 shadow-md transition-opacity duration-150',
           'group-hover/tt:opacity-100 group-focus-within/tt:opacity-100',
-          side === 'bottom' ? 'top-full mt-1.5' : 'bottom-full mb-1.5'
+          SIDE_CLASSES[side]
         )}
       >
         {label}

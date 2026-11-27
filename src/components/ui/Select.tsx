@@ -19,8 +19,7 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 /**
- * Accessible select with keyboard support and custom chevron.
- * Value must be controlled by the caller.
+ * Accessible select with keyboard support, custom chevron, and design tokens.
  */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { label, options, error, hideLabel, placeholder, className, id, required, ...props },
@@ -35,11 +34,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       <label
         htmlFor={selectId}
         className={cn(
-          'mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500',
+          'mb-1.5 block text-xs font-semibold tracking-wide text-foreground-muted',
           hideLabel && 'sr-only'
         )}
       >
         {label}
+        {required && <span aria-hidden className="ml-0.5 text-danger">*</span>}
       </label>
       <div className="relative">
         <select
@@ -49,10 +49,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            'h-11 w-full appearance-none rounded-xl border bg-white px-3.5 pr-10 text-sm text-slate-900 shadow-sm',
-            'focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40',
-            'disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400',
-            error ? 'border-red-300 focus:ring-red-200' : 'border-slate-200',
+            'h-10 w-full appearance-none rounded-lg border bg-surface px-3.5 pr-9 text-sm text-foreground shadow-sm transition-colors duration-150',
+            'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
+            'disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-foreground-subtle',
+            error ? 'border-danger focus:border-danger focus:ring-danger/20' : 'border-border hover:border-border-strong',
             className
           )}
           {...props}
@@ -69,12 +69,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
           ))}
         </select>
         <ChevronDown
-          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-subtle"
           aria-hidden
         />
       </div>
       {error && (
-        <p id={errorId} role="alert" className="mt-1 text-xs font-medium text-red-600">
+        <p id={errorId} role="alert" className="mt-1 text-xs font-medium text-danger">
           {error}
         </p>
       )}
